@@ -7,18 +7,6 @@
 
 import UIKit
 
-class CalculatorApp {
-    var numOne: Double? = nil
-    var numTwo: Double? = nil
-    var action: Actions? = nil
-    var isActionChoosen: Bool = false
-    var isDotActive: Bool = false
-    var hasTwoParameters: Bool = true
-}
-
-let calculator = CalculatorApp()
-
-
 enum Actions {
     case addition
     case substraction
@@ -27,12 +15,16 @@ enum Actions {
 }
 
 class ViewController: UIViewController {
+    var numOne: Double? = nil
+    var numTwo: Double? = nil
+    var action: Actions? = nil
+    var isActionChoosen: Bool = false
+    var isDotActive: Bool = false
+    var hasTwoParameters: Bool = true
 
     @IBOutlet weak var resultLabel: UILabel!
     
-    
     @IBOutlet var actionButtons: Array<UIButton>!
-
     
     @IBAction func numButtons(_ sender: UIButton) {
         for button in actionButtons {
@@ -41,32 +33,32 @@ class ViewController: UIViewController {
         resultLabel.text = resultLabel.text! + String(sender.tag)
     }
     
-    func setAction(action: Actions, button: UIButton) {
+    func setAction(newAction: Actions, button: UIButton) {
         checkActionIsChoosen()
         resultLabel.text = ""
-        calculator.action = action
-        calculator.isDotActive = false
+        action = newAction
+        isDotActive = false
         highLightButton(button: button)
     }
     
     // сложение
     @IBAction func additionAction(_ sender: UIButton) {
-        setAction(action: .addition, button: sender);
+        setAction(newAction: .addition, button: sender);
     }
     
     // вычитание
     @IBAction func substractionAction(_ sender: UIButton) {
-        setAction(action: .substraction, button: sender);
+        setAction(newAction: .substraction, button: sender);
     }
     
     // умножение
     @IBAction func multiplicationAction(_ sender: UIButton) {
-        setAction(action: .multiplication, button: sender);
+        setAction(newAction: .multiplication, button: sender);
     }
     
     // деление
     @IBAction func divisionAction(_ sender: UIButton) {
-        setAction(action: .division, button: sender);
+        setAction(newAction: .division, button: sender);
     }
     
 
@@ -74,15 +66,15 @@ class ViewController: UIViewController {
     // проценты
     @IBAction func percentAction(_ sender: UIButton) {
         if resultLabel.text != "" {
-            resultLabel.text = String(calculator.numOne! / 100 * Double(resultLabel.text!)!)
+            resultLabel.text = String(numOne! / 100 * Double(resultLabel.text!)!)
         }
     }
     
     //  квадратный корень
     @IBAction func squarerootAction(_ sender: UIButton) {
         if resultLabel.text != "" {
-            calculator.numOne = Double(resultLabel.text!)!
-            resultLabel.text = String(calculator.numOne!.squareRoot())
+            numOne = Double(resultLabel.text!)!
+            resultLabel.text = String(numOne!.squareRoot())
         }
     }
     
@@ -95,12 +87,13 @@ class ViewController: UIViewController {
     
     // АС
     @IBAction func allClearButton(_ sender: UIButton) {
-        calculator.numOne = nil
-        calculator.numTwo = nil
-        calculator.action = nil
-        calculator.isActionChoosen = false
-        calculator.hasTwoParameters = true
+        numOne = nil
+        numTwo = nil
+        action = nil
+        isActionChoosen = false
+        hasTwoParameters = true
         resultLabel.text = ""
+        isDotActive = false
         for button in actionButtons {
             button.backgroundColor = .systemGray5
         }
@@ -108,9 +101,9 @@ class ViewController: UIViewController {
     
     // точка
     @IBAction func dotAction(_ sender: UIButton) {
-        if calculator.isDotActive == false && resultLabel.text != "" {
+        if isDotActive == false && resultLabel.text != "" {
             resultLabel.text = resultLabel.text! + "."
-            calculator.isDotActive = true
+            isDotActive = true
         }
     }
     
@@ -118,26 +111,27 @@ class ViewController: UIViewController {
     // равно
     @IBAction func resultButton(_ sender: UIButton) {
         calculate()
-        calculator.isActionChoosen = false
+        isActionChoosen = false
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
     }
     
-    func doubleToInt() {
-        let resultString = resultLabel.text!.split(separator: ".")
-        if Int(resultString[1]) == 0 {
-            resultLabel.text = String(resultString[0])
+    func trimZero() {
+        let inputValue = Double(resultLabel.text!)
+        let fract = inputValue!.truncatingRemainder(dividingBy: 1)
+        if (fract == 0) {
+            resultLabel.text = String(Int(inputValue!))
         }
     }
     
     func checkActionIsChoosen () {
-        if calculator.isActionChoosen {
+        if isActionChoosen {
             calculate()
         } else if resultLabel.text != "" {
-            calculator.isActionChoosen = true
-            calculator.numOne = Double(resultLabel.text!)!
+            isActionChoosen = true
+            numOne = Double(resultLabel.text!)!
         }
     }
     
@@ -152,60 +146,62 @@ class ViewController: UIViewController {
         let inputValue = Double(resultLabel.text!)
        
         if resultLabel.text == "" {
-            calculator.numTwo = calculator.numOne
-            calculator.hasTwoParameters = false
+            numTwo = numOne
+            hasTwoParameters = false
         }
         
-        switch calculator.action {
+        switch action {
             
             case .addition:
                 if resultLabel.text == "" {
-                    resultLabel.text = String(calculator.numOne! + calculator.numOne!)
-                } else if resultLabel.text != "" && calculator.hasTwoParameters == false {
-                    calculator.numOne! = inputValue! + calculator.numTwo!
-                    resultLabel.text = String(calculator.numOne!)
+                    resultLabel.text = String(numOne! + numOne!)
+                } else if resultLabel.text != "" && hasTwoParameters == false {
+                    numOne! = inputValue! + numTwo!
+                    resultLabel.text = String(numOne!)
                 } else {
-                    calculator.numOne = calculator.numOne! + inputValue!
-                    resultLabel.text = String(calculator.numOne!)
+                    numOne = numOne! + inputValue!
+                    resultLabel.text = String(numOne!)
                 }
             
             case .substraction:
                 if resultLabel.text == "" {
-                    resultLabel.text = String(calculator.numOne! - calculator.numOne!)
-                } else if resultLabel.text != "" && calculator.hasTwoParameters == false {
-                    calculator.numOne = inputValue! - calculator.numTwo!
-                    resultLabel.text = String(calculator.numOne!)
+                    resultLabel.text = String(numOne! - numOne!)
+                } else if resultLabel.text != "" && hasTwoParameters == false {
+                    numOne = inputValue! - numTwo!
+                    resultLabel.text = String(numOne!)
                 } else {
-                    calculator.numOne = calculator.numOne! - inputValue!
-                    resultLabel.text = String(calculator.numOne!)
+                    numOne = numOne! - inputValue!
+                    resultLabel.text = String(numOne!)
                 }
             
             case .multiplication:
                 if resultLabel.text == "" {
-                    resultLabel.text = String(calculator.numOne! * calculator.numOne!)
-                } else if resultLabel.text != "" && calculator.hasTwoParameters == false {
-                    calculator.numOne! = inputValue! * calculator.numTwo!
-                    resultLabel.text = String(calculator.numOne!)
+                    resultLabel.text = String(numOne! * numOne!)
+                } else if resultLabel.text != "" && hasTwoParameters == false {
+                    numOne! = inputValue! * numTwo!
+                    resultLabel.text = String(numOne!)
                 } else {
-                    calculator.numOne = calculator.numOne! * inputValue!
-                    resultLabel.text = String(calculator.numOne!)
+                    numOne = numOne! * inputValue!
+                    resultLabel.text = String(numOne!)
                 }
             
             case .division:
                 if resultLabel.text == "" {
-                    resultLabel.text = String(calculator.numOne! / calculator.numOne!)
-                } else if resultLabel.text != "" && calculator.hasTwoParameters == false {
-                    calculator.numOne = inputValue! / calculator.numTwo!
-                    resultLabel.text = String(calculator.numOne!)
+                    resultLabel.text = String(numOne! / numOne!)
+                } else if resultLabel.text != "" && hasTwoParameters == false {
+                    numOne = inputValue! / numTwo!
+                    resultLabel.text = String(numOne!)
                 } else {
-                    calculator.numOne = calculator.numOne! / inputValue!
-                    resultLabel.text = String(calculator.numOne!)
+                    numOne = numOne! / inputValue!
+                    resultLabel.text = String(numOne!)
                 }
             
             case .none:
                 break
         }
-        doubleToInt()
+        if resultLabel.text != "" {
+            trimZero()
+        }
     }
 }
 
