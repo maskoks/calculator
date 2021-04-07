@@ -204,5 +204,3 @@ class ViewController: UIViewController {
         }
     }
 }
-
-// надо сделать что то с отображением числе в виде Инт и Дабл
