@@ -1,2 +1,2 @@
 # calculator
-My first calculator! Hoora
+My first calculator
